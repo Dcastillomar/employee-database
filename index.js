@@ -1,6 +1,8 @@
+//required app
 const inquirer = require("inquirer");
 const mysql = require("mysql2")
 
+//start up questions for user
 const questions = [
 
 
@@ -11,7 +13,7 @@ const questions = [
         choices: ["view all departments", "view all roles", "view all employees", "add a department", "add a role", "add an employee", "update an employee role"],
     }];
 
-
+//questions if the user selects add employee
 const employeeQuestions = [
     {
         type: "input",
@@ -35,6 +37,7 @@ const employeeQuestions = [
         message: "Enter Department",
     }];
 
+    //questions for user if chooses add a role
 const addRoleQuestions = [
     {
         type: "input",
@@ -58,13 +61,14 @@ const addRoleQuestions = [
     },
 ]
 
+// questions for user if chooses add a department
 const addDepartmentQuestions = [
     {type: "input",
      name: "department",
      message: "Enter Department",
     },
 ]
-//functions to have the sub questions fire, need to add on the update employee
+//function to have the sub questions fire if add employee is chosen
 function addEmployee() {
     return inquirer.prompt(employeeQuestions).then((userInput) => {
         //function that writes this data into the database
@@ -73,6 +77,8 @@ function addEmployee() {
     });
 
 }
+
+//function to have the sub questions fire if add role is chosen
 
 function addRole() {
     return inquirer.prompt(addRoleQuestions).then((userInput) => {
@@ -83,6 +89,8 @@ function addRole() {
 
 }
 
+//function to have the sub questions fire if add department is chosen
+
 function addDepartment() {
     return inquirer.prompt(addDepartmentQuestions).then((userInput) => {
         //function that writes this data into the database
@@ -92,6 +100,7 @@ function addDepartment() {
 
 }
 
+//function to begin the questions and fire the sub questions if certain choices are selected
 function beginQuestions() {
     return inquirer.prompt(questions).then(userInput => {
 if(userInput.startChoice === "add an employee"){
@@ -105,24 +114,9 @@ if(userInput.startChoice === "add an employee"){
 }
 
 
-             
-          
-
-
-
-//create a function to initialize app
-// function showOption
-
-
-
-
-
-// Function to initialize the app
-
-
-// Call the app
+//Call the app
 beginQuestions();
 
-//add sub questions depending on the choices picked
+//create an update employee feature
 //create file with data base
 //create file that contains the functions to add the functionality of the database
