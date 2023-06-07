@@ -1,16 +1,15 @@
-//required apps
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
-const connection = require("./connection.js")
+const connection = require("./connection.js");
 
-//start up questions for user
+// Start up questions for the user
 init();
 
-function init(){
+function init() {
     loadPrompts();
-};
+}
 
-function loadPrompts(){
+function loadPrompts() {
     inquirer.prompt([
         {
             type: "list",
@@ -19,20 +18,19 @@ function loadPrompts(){
             choices: [
                 {
                     name: "view all departments",
-                    value: "view_employees",
+                    value: "view_departments",
                 },
-
                 {
                     name: "view all roles",
-                    value: "view_roles"
+                    value: "view_roles",
                 },
                 {
                     name: "view all employees",
-                    value: "view_employees"
+                    value: "view_employees",
                 },
                 {
                     name: "add a department",
-                    value: "add_department"
+                    value: "add_department",
                 },
                 {
                     name: "add a role",
@@ -44,26 +42,37 @@ function loadPrompts(){
                 },
                 {
                     name: "update an employee role",
-                    value: "update_employee"
-                }
-            ]
+                    value: "update_employee",
+                },
+            ],
+        },
+    ]).then((userChoice) => {
+        switch (userChoice.choice) {
+            case "view_employees":
+                viewEmployees();
+                break;
+            case "view_departments":
+                viewDepartments();
+                break;
+            case "view_roles":
+                viewRoles();
+                break;
+            case "add_department":
+                addDepartment();
+                break;
+            case "add_role":
+                addRole();
+                break;
+            case "add_employee":
+                addEmployee();
+                break;
+            case "update_employee":
+                updateEmployee();
+                break;
         }
-    ])
-        .then((userChoice) => {
-            switch (userChoice.choice) {
-                case "view_employees":
-                    viewEmployees();
-                    break;
-                case "view_departments":
-                    viewDepartments();
-                    break;
-            }
-        });
+    });
+}
 
-};
-
-
-//questions if the user selects add employee
 const employeeQuestions = [
     {
         type: "input",
@@ -79,15 +88,14 @@ const employeeQuestions = [
         type: "input",
         name: "salary",
         message: "Enter Salary",
-
     },
     {
         type: "input",
         name: "department",
         message: "Enter Department",
-    }];
+    },
+];
 
-//questions for user if chooses add a role
 const addRoleQuestions = [
     {
         type: "input",
@@ -109,68 +117,125 @@ const addRoleQuestions = [
         name: "department",
         message: "Enter Department",
     },
-]
+];
 
-// questions for user if chooses add a department
 const addDepartmentQuestions = [
     {
         type: "input",
-        name: "department",
-        message: "Enter Department",
+        name: "departmentId",
+        message: "Enter Department ID",
     },
-]
-//function to have the sub questions fire if add employee is chosen
+    {
+        type: "input",
+        name: "departmentName",
+        message: "Enter Department Name",
+    },
+];
+
+const updateEmployeeInfo = [
+    {
+        type: "input",
+        name: "employeeId",
+        message: "Enter the ID of the employee you want to update:",
+    },
+    {
+        type: "input",
+        name: "newSalary",
+        message: "Enter the new salary for the employee:",
+    },
+    {
+        type: "input",
+        name: "newDepartment",
+        message: "Enter the new department for the employee:",
+    },
+];
+
 function addEmployee() {
     return inquirer.prompt(employeeQuestions).then((userInput) => {
-        //function that writes this data into the database
-
-        console.log("Employee added:", userInput);
+        connection.query(
+            `INSERT INTO employee (firstName, lastName, salary, department) VALUES (?, ?, ?, ?)`,
+            [userInput.firstName, userInput.lastName, userInput.salary, userInput.department],
+            (err, result) => {
+                if (err) {
+                    console.error("Error adding employee", err);
+                } else {
+                    console.log("Employee added", userInput);
+                }
+            }
+        );
     });
-
 }
-
-//function to have the sub questions fire if add role is chosen
 
 function addRole() {
     return inquirer.prompt(addRoleQuestions).then((userInput) => {
-        //function that writes this data into the database
-
-        console.log("Role added:", userInput);
+        connection.query(
+            `INSERT INTO department_role (firstName, lastName, salary, department_id) VALUES (?,?,?,?)`,
+            [userInput.firstName, userInput.lastName, userInput.salary, userInput.department],
+            (err, result) => {
+                if (err) {
+                    console.error("Error adding Role", err);
+                } else {
+                    console.log("Role added", userInput);
+                }
+            }
+        );
     });
-
 }
-
-//function to have the sub questions fire if add department is chosen
 
 function addDepartment() {
     return inquirer.prompt(addDepartmentQuestions).then((userInput) => {
-        //function that writes this data into the database
-
-        console.log("Department added:", userInput);
-    });
-
-}
-
-//function to begin the questions and fire the sub questions if certain choices are selected
-function beginQuestions() {
-    return inquirer.prompt(questions).then(userInput => {
-        if (userInput.startChoice === "add an employee") {
-            return addEmployee();
-        } else if (userInput.startChoice === "add a role") {
-            return addRole();
-        } else if (userInput.startChoice === "add a department") {
-            return addDepartment();
-        }
+        connection.query(
+            `INSERT INTO department (id, department_name) VALUES (?,?)`,
+            [userInput.departmentId, userInput.departmentName],
+            (err, result) => {
+                if (err) {
+                    console.error("Error adding department", err);
+                } else {
+                    console.log("Department added", userInput);
+                }
+            }
+        );
     });
 }
 
-const viewEmployees= ()=>{
-var [results] = connection.query("SELECT * FROM employee;");
-console.log(results)
-}; 
+//update employee function
+function updateEmployee() {
+    return inquirer.prompt(updateEmployeeInfo).then((userInput) => {
+        const { employeeId, newSalary, newDepartment } = userInput;
 
-//Call the app
-//beginQuestions();
+        connection.query(
+            `UPDATE employee SET salary = ?, department = ? WHERE id = ?`,
+            [newSalary, newDepartment, employeeId],
+            (err, result) => {
+                if (err) {
+                    console.error("Error updating employee", err);
+                } else {
+                    console.log("Employee updated successfully");
+                }
+            }
+        );
+    });
+}
 
-//create an update employee feature
-//create file that contains the functions to add the functionality of the database
+function viewEmployees() {
+    connection.query('SELECT * FROM employee', function (err, results) {
+        console.log(results);
+    });
+}
+
+function viewDepartments() {
+    connection.query('SELECT * FROM department', function (err, results) {
+        console.log(results);
+    });
+}
+
+function viewRoles() {
+    connection.query('SELECT * FROM department_role', function (err, results) {
+        console.log(results);
+    });
+}
+
+// Call the app
+loadPrompts();
+
+
