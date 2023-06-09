@@ -2,6 +2,91 @@ const inquirer = require("inquirer");
 const mysql = require("mysql2");
 const connection = require("./connection.js");
 
+//Questions
+const employeeQuestions = [
+    {
+        type: "input",
+        name: "firstName",
+        message: "Enter First Name",
+    },
+    {
+        type: "input",
+        name: "lastName",
+        message: "Enter Last Name",
+    },
+    {
+        type: "input",
+        name: "roleID",
+        message: "Enter Role ID",
+    },
+    {
+        type: "input",
+        name: "managerID",
+        message: "Enter Manager ID",
+    },
+];
+
+const addRoleQuestions = [
+    // {
+    //     type: "input",
+    //     name: "roleID",
+    //     message: "Enter Role ID",
+    // },
+  
+    {
+        type: "input",
+        name: "title",
+        message: "Enter Title",
+    },
+    {
+        type: "input",
+        name: "salary",
+        message: "Enter Salary",
+    },
+    {
+        type: "input",
+        name: "department",
+        message: "Enter Department",
+    },
+];
+
+const addDepartmentQuestions = [
+    // {
+    //     type: "input",
+    //     name: "departmentId",
+    //     message: "Enter Department ID",
+    // },
+    {
+        type: "input",
+        name: "departmentName",
+        message: "Enter Department Name",
+    },
+];
+
+const updateEmployeeInfo = [
+  
+    // {
+    //     type: "input",
+    //     name: "newTitle",
+    //     message: "Enter the new title",
+    // },
+    // {
+    //     type: "input",
+    //     name: "newSalary",
+    //     message: "Enter the new salary for the employee:",
+    // },
+     {
+        type: "input",
+        name: "employeeId",
+        message: "Enter the ID of the employee you want to update:",
+    },
+    {
+        type: "input",
+        name: "roleID",
+        message: "Enter the new role ID for the employee:",
+    }, 
+];
+
 // Start up questions for the user
 init();
 
@@ -73,94 +158,18 @@ function loadPrompts() {
     });
 }
 
-const employeeQuestions = [
-    {
-        type: "input",
-        name: "firstName",
-        message: "Enter First Name",
-    },
-    {
-        type: "input",
-        name: "lastName",
-        message: "Enter Last Name",
-    },
-    {
-        type: "input",
-        name: "salary",
-        message: "Enter Salary",
-    },
-    {
-        type: "input",
-        name: "department",
-        message: "Enter Department",
-    },
-];
-
-const addRoleQuestions = [
-    {
-        type: "input",
-        name: "firstName",
-        message: "Enter First Name",
-    },
-    {
-        type: "input",
-        name: "lastName",
-        message: "Enter Last Name",
-    },
-    {
-        type: "input",
-        name: "salary",
-        message: "Enter Salary",
-    },
-    {
-        type: "input",
-        name: "department",
-        message: "Enter Department",
-    },
-];
-
-const addDepartmentQuestions = [
-    {
-        type: "input",
-        name: "departmentId",
-        message: "Enter Department ID",
-    },
-    {
-        type: "input",
-        name: "departmentName",
-        message: "Enter Department Name",
-    },
-];
-
-const updateEmployeeInfo = [
-    {
-        type: "input",
-        name: "employeeId",
-        message: "Enter the ID of the employee you want to update:",
-    },
-    {
-        type: "input",
-        name: "newSalary",
-        message: "Enter the new salary for the employee:",
-    },
-    {
-        type: "input",
-        name: "newDepartment",
-        message: "Enter the new department for the employee:",
-    },
-];
-
 function addEmployee() {
     return inquirer.prompt(employeeQuestions).then((userInput) => {
         connection.query(
-            `INSERT INTO employee (firstName, lastName, salary, department) VALUES (?, ?, ?, ?)`,
-            [userInput.firstName, userInput.lastName, userInput.salary, userInput.department],
+            `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
+            [userInput.firstName, userInput.lastName, userInput.roleID, userInput.managerID],
             (err, result) => {
                 if (err) {
                     console.error("Error adding employee", err);
                 } else {
                     console.log("Employee added", userInput);
                 }
+                loadPrompts();
             }
         );
     });
@@ -169,14 +178,15 @@ function addEmployee() {
 function addRole() {
     return inquirer.prompt(addRoleQuestions).then((userInput) => {
         connection.query(
-            `INSERT INTO department_role (firstName, lastName, salary, department_id) VALUES (?,?,?,?)`,
-            [userInput.firstName, userInput.lastName, userInput.salary, userInput.department],
+            `INSERT INTO department_role (title, salary, department_id) VALUES (?,?,?)`,
+            [userInput.title, userInput.salary, userInput.department],
             (err, result) => {
                 if (err) {
                     console.error("Error adding Role", err);
                 } else {
                     console.log("Role added", userInput);
                 }
+                loadPrompts();
             }
         );
     });
@@ -185,14 +195,15 @@ function addRole() {
 function addDepartment() {
     return inquirer.prompt(addDepartmentQuestions).then((userInput) => {
         connection.query(
-            `INSERT INTO department (id, department_name) VALUES (?,?)`,
-            [userInput.departmentId, userInput.departmentName],
+            `INSERT INTO department (department_name) VALUES (?)`,
+            [userInput.departmentName],
             (err, result) => {
                 if (err) {
                     console.error("Error adding department", err);
                 } else {
                     console.log("Department added", userInput);
                 }
+                loadPrompts();
             }
         );
     });
@@ -201,17 +212,18 @@ function addDepartment() {
 //update employee function
 function updateEmployee() {
     return inquirer.prompt(updateEmployeeInfo).then((userInput) => {
-        const { employeeId, newSalary, newDepartment } = userInput;
+        const { roleID, employeeId } = userInput;
 
         connection.query(
-            `UPDATE employee SET salary = ?, department = ? WHERE id = ?`,
-            [newSalary, newDepartment, employeeId],
+            `UPDATE employee SET role_id = ? WHERE id = ?`,
+            [ roleID, employeeId ],
             (err, result) => {
                 if (err) {
                     console.error("Error updating employee", err);
                 } else {
                     console.log("Employee updated successfully");
                 }
+                loadPrompts();
             }
         );
     });
@@ -221,18 +233,21 @@ function viewEmployees() {
     connection.query('SELECT * FROM employee', function (err, results) {
         console.log(results);
     });
+    loadPrompts();
 }
 
 function viewDepartments() {
     connection.query('SELECT * FROM department', function (err, results) {
         console.log(results);
     });
+    loadPrompts();
 }
 
 function viewRoles() {
     connection.query('SELECT * FROM department_role', function (err, results) {
         console.log(results);
     });
+    loadPrompts();
 }
 
 // Call the app
