@@ -20,9 +20,16 @@ const employeeQuestions = [
         message: "Enter the new title for the employee:",
     },
     {
-        type: "input",
-        name: "roleID",
-        message: "Enter Role ID",
+        type: "list",
+        name: "departmentName",
+        message: "Which Department?",
+        choices: ["Legal", "Production", "HR", "IT", "Transport", "Accounting", "Sales"]
+    },
+    {
+        type: "list",
+        name: "departmentID",
+        message: "Which Department ID 1--HR, 2--Sales, 3--Production, 4--Legal, 5--IT, 6--Transport, 7--Accounting",
+        choices: ['1', '2', '3', '4', '5', '6', '7']
     },
     {
         type: "input",
@@ -30,19 +37,14 @@ const employeeQuestions = [
         message: "Enter the new salary for the employee:",
     },
     {
-        type: "input",
+        type: "list",
         name: "managerID",
-        message: "Enter Manager ID",
+        message: "Enter Manager",
+        choices: ["Mary Robins", "Mark Judd", "Tim Mosley", "Jessie James", "Jack Daniels", "Robyn Robert", "Molly Shannon"]
     },
 ];
 
 const addRoleQuestions = [
-    // {
-    //     type: "input",
-    //     name: "roleID",
-    //     message: "Enter Role ID",
-    // },
-
     {
         type: "input",
         name: "title",
@@ -54,16 +56,23 @@ const addRoleQuestions = [
         message: "Enter Salary",
     },
     {
-        type: "input",
-        name: "departmentID",
-        message: "Enter Department ID",
+        type: "list",
+        name: "roleDepartmentName",
+        message: "Enter Department",
+        choices: ['Legal', 'Production', 'HR', 'IT', 'Transport', 'Accounting', 'Sales']
+    },
+    {
+        type: "list",
+        name: "roleDepartmentID",
+        message: "Which Department ID 1--HR, 2--Sales, 3--Production, 4--Legal, 5--IT, 6--Transport, 7--Accounting",
+        choices: ['1', '2', '3', '4', '5', '6', '7']
     },
 ];
 
 const addDepartmentQuestions = [
     {
         type: "input",
-        name: "departmentName",
+        name: "addDepartmentName",
         message: "Enter Department Name",
     },
 ];
@@ -81,9 +90,12 @@ const updateEmployeeInfo = [
         message: "Enter the new title for the employee:",
     },
     {
-        type: "input",
+
+        type: "list",
         name: "roleID",
-        message: "Enter the new role ID for the employee:",
+        message: "Which Department?",
+        choices: ["Legal", "Production", "HR", "IT", "Transport", "Accounting", "Sales"]
+
     },
     {
         type: "input",
@@ -91,6 +103,48 @@ const updateEmployeeInfo = [
         message: "Enter the new salary for the employee:",
     },
 ];
+
+const updateManager = [
+    {
+        type: "input",
+        name: "employeeIdToBeUpdated",
+        message: "Enter the ID of the employee you want to update:",
+    },
+
+    {
+        type: "list",
+        name: "newManagerName",
+        message: "Enter new manager",
+        choices: ["Mary Robins", "Mark Judd", "Tim Mosley", "Jessie James", "Jack Daniels", "Robyn Robert", "Molly Shannon"]
+    },
+]
+
+const viewByManagerQuestions = [
+    {
+        type: "list",
+        name: "viewByManagerName",
+        message: "What manager would you like to sort employees by?",
+        choices: ["Mary Robins", "Mark Judd", "Tim Mosley", "Jessie James", "Jack Daniels", "Robyn Robert", "Molly Shannon"]
+    },
+]
+
+const viewByDepartmentQuestions = [
+    {
+        type: "list",
+        name: "viewByDepartmentName",
+        message: "Which Department would you like to sort employees by?",
+        choices: ["Legal", "Production", "HR", "IT", "Transport", "Accounting", "Sales"]
+    },
+]
+
+// const deleteDepartmentQuestions = [
+//     {
+//         type: "list",
+//         name: "deleteDepartmentByID",
+//         message: "Which Department would you like to delete? 1--HR, 2--Sales, 3--Production, 4--Legal, 5--IT, 6--Transport, 7--Accounting",
+//         choices: ['1', '2', '3', '4', '5', '6', '7']
+//     },
+// ]
 
 // Start up questions for the user
 init();
@@ -134,6 +188,22 @@ function loadPrompts() {
                     name: "update an employee role",
                     value: "update_employee",
                 },
+                {
+                    name: "update employee manager",
+                    value: "update_manager",
+                },
+                {
+                    name: "view by manager",
+                    value: "view_by_manager",
+                },
+                {
+                    name: "view by department",
+                    value: "view_by_department",
+                },
+                // {
+                //     name: "delete department",
+                //     value: "delete_department",
+                // },
             ],
         },
     ]).then((userChoice) => {
@@ -159,6 +229,18 @@ function loadPrompts() {
             case "update_employee":
                 updateEmployee();
                 break;
+            case "update_manager":
+                updateEmployeeManager();
+                break;
+            case "view_by_manager":
+                viewByManager();
+                break;
+            case "view_by_department":
+                viewByDepartment();
+                break;
+                // case "delete_department":
+                //     deleteDepartment();
+                //     break;
         }
     });
 }
@@ -166,8 +248,8 @@ function loadPrompts() {
 function addEmployee() {
     return inquirer.prompt(employeeQuestions).then((userInput) => {
         connection.query(
-            `INSERT INTO employee (first_name, last_name, title, role_id, salary, manager_id) VALUES (?, ?, ?, ?, ?, ?)`,
-            [userInput.firstName, userInput.lastName, userInput.title, userInput.roleID, userInput.salary, userInput.managerID],
+            `INSERT INTO employee (first_name, last_name, title, department_name, role_id, salary, manager_id) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [userInput.firstName, userInput.lastName, userInput.title, userInput.departmentName, userInput.departmentID, userInput.salary, userInput.managerID],
             (err, result) => {
                 if (err) {
                     console.error("Error adding employee", err);
@@ -183,8 +265,8 @@ function addEmployee() {
 function addRole() {
     return inquirer.prompt(addRoleQuestions).then((userInput) => {
         connection.query(
-            `INSERT INTO department_role (title, salary, department_id) VALUES (?, ?, ?)`,
-            [userInput.title, userInput.salary, userInput.departmentID],
+            `INSERT INTO department_role (title, salary, department_name, department_id) VALUES (?, ?, ?, ?)`,
+            [userInput.title, userInput.salary, userInput.roleDepartmentName, userInput.roleDepartmentID],
             (err, result) => {
                 if (err) {
                     console.error("Error adding Role", err);
@@ -201,7 +283,7 @@ function addDepartment() {
     return inquirer.prompt(addDepartmentQuestions).then((userInput) => {
         connection.query(
             `INSERT INTO department (department_name) VALUES (?)`,
-            [userInput.departmentName],
+            [userInput.addDepartmentName],
             (err, result) => {
                 if (err) {
                     console.error("Error adding department", err);
@@ -220,8 +302,8 @@ function updateEmployee() {
         const { newTitle, roleID, newSalary, employeeId } = userInput;
 
         connection.query(
-            `UPDATE employee SET title = ?, role_id = ?, salary =? WHERE id = ?`,
-            [newTitle, roleID, newSalary,employeeId],
+            `UPDATE employee SET title = ?, department_name = ?, salary =? WHERE id = ?`,
+            [newTitle, roleID, newSalary, employeeId],
             (err, result) => {
                 if (err) {
                     console.error("Error updating employee", err);
@@ -268,6 +350,69 @@ function viewRoles() {
         } loadPrompts();
     });
 }
+
+//lets you update employee manager
+function updateEmployeeManager() {
+    return inquirer.prompt(updateManager).then((userInput) => {
+        const { newManagerName } = userInput;
+
+        connection.query(
+            `UPDATE employee SET manager_id =? WHERE id = ?`,
+            [newManagerName, userInput.employeeIdToBeUpdated],
+            (err, result) => {
+                if (err) {
+                    console.error("Error updating employee manager", err);
+                } else {
+                    console.log("Employee manager updated successfully");
+                }
+                loadPrompts();
+            }
+        );
+    });
+}
+//lets user view employees by manager
+function viewByManager() {
+    return inquirer.prompt(viewByManagerQuestions).then((userInput) => {
+        connection.query('SELECT * FROM employee WHERE manager_id = ?',
+            [userInput.viewByManagerName],
+            (err, results) => {
+                if (err) {
+                    console.error("Error viewing by manager", err)
+                } else {
+                    console.table(results);
+                } loadPrompts();
+            });
+    })
+}
+
+//lets user view employees by department
+function viewByDepartment() {
+    return inquirer.prompt(viewByDepartmentQuestions).then((userInput) => {
+        connection.query('SELECT * FROM employee WHERE department_name = ?',
+            [userInput.viewByDepartmentName],
+            (err, results) => {
+                if (err) {
+                    console.error("Error viewing by department", err)
+                } else {
+                    console.table(results);
+                } loadPrompts();
+            });
+    })
+}
+
+// function deleteDepartment() {
+//     return inquirer.prompt(deleteDepartmentQuestions).then((userInput) => {
+//         connection.query('Delete FROM department WHERE id = ?',
+//             [userInput.deleteDepartmentByID],
+//             (err, results) => {
+//                 if (err) {
+//                     console.error("Error deleting department", err)
+//                 } else {
+//                     console.table(results);
+//                 } loadPrompts();
+//             });
+//     })
+// }
 
 // Call the app
 loadPrompts();
