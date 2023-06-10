@@ -32,7 +32,7 @@ const addRoleQuestions = [
     //     name: "roleID",
     //     message: "Enter Role ID",
     // },
-  
+
     {
         type: "input",
         name: "title",
@@ -45,17 +45,12 @@ const addRoleQuestions = [
     },
     {
         type: "input",
-        name: "department",
-        message: "Enter Department",
+        name: "departmentID",
+        message: "Enter Department ID",
     },
 ];
 
 const addDepartmentQuestions = [
-    // {
-    //     type: "input",
-    //     name: "departmentId",
-    //     message: "Enter Department ID",
-    // },
     {
         type: "input",
         name: "departmentName",
@@ -64,18 +59,8 @@ const addDepartmentQuestions = [
 ];
 
 const updateEmployeeInfo = [
-  
-    // {
-    //     type: "input",
-    //     name: "newTitle",
-    //     message: "Enter the new title",
-    // },
-    // {
-    //     type: "input",
-    //     name: "newSalary",
-    //     message: "Enter the new salary for the employee:",
-    // },
-     {
+
+    {
         type: "input",
         name: "employeeId",
         message: "Enter the ID of the employee you want to update:",
@@ -84,7 +69,7 @@ const updateEmployeeInfo = [
         type: "input",
         name: "roleID",
         message: "Enter the new role ID for the employee:",
-    }, 
+    },
 ];
 
 // Start up questions for the user
@@ -157,7 +142,7 @@ function loadPrompts() {
         }
     });
 }
-
+//adds an employee and return to main prompts
 function addEmployee() {
     return inquirer.prompt(employeeQuestions).then((userInput) => {
         connection.query(
@@ -174,12 +159,12 @@ function addEmployee() {
         );
     });
 }
-
+//adds a role and return to main prompts
 function addRole() {
     return inquirer.prompt(addRoleQuestions).then((userInput) => {
         connection.query(
-            `INSERT INTO department_role (title, salary, department_id) VALUES (?,?,?)`,
-            [userInput.title, userInput.salary, userInput.department],
+            `INSERT INTO department_role (title, salary, department_id) VALUES (?, ?, ?)`,
+            [userInput.title, userInput.salary, userInput.departmentID],
             (err, result) => {
                 if (err) {
                     console.error("Error adding Role", err);
@@ -191,7 +176,7 @@ function addRole() {
         );
     });
 }
-
+//adds a department and return to main prompts
 function addDepartment() {
     return inquirer.prompt(addDepartmentQuestions).then((userInput) => {
         connection.query(
@@ -209,14 +194,14 @@ function addDepartment() {
     });
 }
 
-//update employee function
+//update employee function and return to main prompts
 function updateEmployee() {
     return inquirer.prompt(updateEmployeeInfo).then((userInput) => {
         const { roleID, employeeId } = userInput;
 
         connection.query(
             `UPDATE employee SET role_id = ? WHERE id = ?`,
-            [ roleID, employeeId ],
+            [roleID, employeeId],
             (err, result) => {
                 if (err) {
                     console.error("Error updating employee", err);
@@ -229,25 +214,39 @@ function updateEmployee() {
     });
 }
 
+//lets you view employees and return to main prompts
 function viewEmployees() {
     connection.query('SELECT * FROM employee', function (err, results) {
-        console.log(results);
+        if (err) {
+            console.error("Error viewing employees", err)
+        } else {
+            console.table(results);
+        }
+        loadPrompts();
     });
-    loadPrompts();
-}
 
+}
+//lets you view departments and return to main prompts
 function viewDepartments() {
     connection.query('SELECT * FROM department', function (err, results) {
-        console.log(results);
+        if (err) {
+            console.error("Error viewing Departments", err)
+        } else {
+            console.table(results);
+        }
+        loadPrompts();
     });
-    loadPrompts();
-}
 
+}
+//lets you view roles and return to main prompts
 function viewRoles() {
     connection.query('SELECT * FROM department_role', function (err, results) {
-        console.log(results);
+        if (err) {
+            console.error("Error viewing roles", err)
+        } else {
+            console.table(results);
+        } loadPrompts();
     });
-    loadPrompts();
 }
 
 // Call the app
