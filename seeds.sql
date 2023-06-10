@@ -19,12 +19,12 @@ VALUES
     (80, "Technician II", "38000.00", 3);
 
 
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
+INSERT INTO employee (id, first_name, last_name, title, role_id, salary, manager_id)
 VALUES
-    (100, "Jack", "Black", 20, 180),
-    (101, "Sherri", "Wack", 80, 181),
-    (102, "Ronald", "Mcdonald", 60, 182),
-    (103, "Reggie", "Baker", 70, 183),
-    (104, "Donna", "Turner", 30, 184),
-    (105, "Sheila", "Skark", 40, 185),
-    (106, "Kelly", "Clark", 50, 186);
+    (100, "Jack", "Black", "Lawyer", 20, "70000.00", 180),
+    (101, "Sherri", "Wack", "Technician II", 80, "38000.00", 181),
+    (102, "Ronald", "Mcdonald", "HR Advisor", 60, "63000.00", 182),
+    (103, "Reggie", "Baker", "Cybersecurity I", 70, "45000.00", 183),
+    (104, "Donna", "Turner", "Truck Driver", 30, "80000.00", 184),
+    (105, "Sheila", "Skark", "Payroll I", 40, "40000.00", 185),
+    (106, "Kelly", "Clark", "Salesperson", 50, "65000.00", 186);

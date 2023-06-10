@@ -16,8 +16,18 @@ const employeeQuestions = [
     },
     {
         type: "input",
+        name: "title",
+        message: "Enter the new title for the employee:",
+    },
+    {
+        type: "input",
         name: "roleID",
         message: "Enter Role ID",
+    },
+    {
+        type: "input",
+        name: "salary",
+        message: "Enter the new salary for the employee:",
     },
     {
         type: "input",
@@ -67,8 +77,18 @@ const updateEmployeeInfo = [
     },
     {
         type: "input",
+        name: "newTitle",
+        message: "Enter the new title for the employee:",
+    },
+    {
+        type: "input",
         name: "roleID",
         message: "Enter the new role ID for the employee:",
+    },
+    {
+        type: "input",
+        name: "newSalary",
+        message: "Enter the new salary for the employee:",
     },
 ];
 
@@ -146,8 +166,8 @@ function loadPrompts() {
 function addEmployee() {
     return inquirer.prompt(employeeQuestions).then((userInput) => {
         connection.query(
-            `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
-            [userInput.firstName, userInput.lastName, userInput.roleID, userInput.managerID],
+            `INSERT INTO employee (first_name, last_name, title, role_id, salary, manager_id) VALUES (?, ?, ?, ?, ?, ?)`,
+            [userInput.firstName, userInput.lastName, userInput.title, userInput.roleID, userInput.salary, userInput.managerID],
             (err, result) => {
                 if (err) {
                     console.error("Error adding employee", err);
@@ -197,11 +217,11 @@ function addDepartment() {
 //update employee function and return to main prompts
 function updateEmployee() {
     return inquirer.prompt(updateEmployeeInfo).then((userInput) => {
-        const { roleID, employeeId } = userInput;
+        const { newTitle, roleID, newSalary, employeeId } = userInput;
 
         connection.query(
-            `UPDATE employee SET role_id = ? WHERE id = ?`,
-            [roleID, employeeId],
+            `UPDATE employee SET title = ?, role_id = ?, salary =? WHERE id = ?`,
+            [newTitle, roleID, newSalary,employeeId],
             (err, result) => {
                 if (err) {
                     console.error("Error updating employee", err);
