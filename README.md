@@ -14,6 +14,8 @@
   ## Description
   This application allows a business owner to view tables containing the departments of the company, the roles in the company and the employees of the company. It also allows the user to add departments, add roles, add employees and update employee information.
 
+  ![alt text](<Assets/Screenshot 2024-03-26 180051.png>)
+
   ## Installation
   Please install inquirer, mysql2, express and have a working mysql username and password.
 
